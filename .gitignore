@@ -1,9 +1,2 @@
-common/*
-contracts/*
-later/*
-shared/*
-tool/*
-
 APIBreakInfo-3.0.0.txt
 hack-net-auto.js
-manager.js
