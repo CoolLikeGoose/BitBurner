@@ -1,16 +1,47 @@
-import {ServerRep} from "/common/server_rep.js";
-import {openUi} from "/UI/timer.tsx"
+import { createManagerUI } from "/UI/ManagerUI.tsx";
+import { injectCSS } from "/UI/UIHelper.tsx";
 
-/** @param {NS} ns */
+/** @param {NS} ns **/
 export async function main(ns) {
-	// let server = new ServerRep(ns, "home");
+	disableLogs();
+	injectCSS(ns, "/UI/styles/button.css.txt", "gbb-styles-custom", "001");
 
-	// await server.generateChilds();
-	// server.printServersTree();
-	// ns.tprint(ns.scan("iron-gym"));
+	const ui = createManagerUI(ns, ns.pid);
 
-	// let hackScript = "/shared/auto_hack.js";
-	// await server.deployOnChildsR(hackScript, ns.getScriptRam(hackScript));
+	ui.mount();
+	await ns.sleep(0);
+	ui.bind();
+	ui.setStatus("ready");
 
-	openUi(ns);
+	ns.atExit(ui.cleanup);
+
+	let page = "MAIN";
+	let prevMoney = -1;
+
+	while (true) {
+		const money = Math.floor(ns.getServerMoneyAvailable("home"));
+
+		if (money !== prevMoney) {
+			if (page === "MAIN") {
+				ui.updateDisplay(`MAIN\nMoney: ${money}`);
+			} else if (page === "MAP") {
+				ui.updateDisplay("MAP\nTest1\nTest2\nTest3");
+			}
+			prevMoney = money;
+		}
+
+		// кнопки
+		const el = ui.elements;
+		if (el.btnMain) el.btnMain.onclick = () => { page = "MAIN"; };
+		if (el.btnMap) el.btnMap.onclick = () => { page = "MAP"; };
+		if (el.btnUpdate) el.btnUpdate.onclick = () => ui.rebind();
+
+		await ns.sleep(500);
+	}
+
+	function disableLogs() {
+		ns.disableLog("disableLog");
+		ns.disableLog("sleep");
+		ns.disableLog("getServerMoneyAvailable");
+	}
 }

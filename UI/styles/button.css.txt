@@ -1,0 +1,21 @@
+.bb-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    font-family: JetBrainsMono, "Courier New", monospace;
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    min-width: 64px;
+    padding: 6px 8px;
+    color: rgb(155, 155, 255);
+    background-color: rgb(35, 35, 55);
+    border: 1px solid rgb(17, 17, 17);
+    transition: background-color 150ms ease;
+}
+
+.bb-button:hover {
+    background-color: rgb(17, 16, 17);
+}
