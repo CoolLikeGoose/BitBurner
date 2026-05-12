@@ -1,4 +1,4 @@
-import { TextDisplay } from "/UI/components/TextDisplay.tsx";
+import { TextDisplay } from "../components/TextDisplay.tsx";
 
 export function MainPage() {
     const money = TextDisplay("money", "Money");

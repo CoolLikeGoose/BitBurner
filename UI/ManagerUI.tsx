@@ -1,6 +1,6 @@
-import { RootUI } from "/UI/components/RootUI.tsx";
-import { MainPage } from "/UI/pages/MainPage.tsx";
-import { MapPage } from "/UI/pages/MapPage.tsx";
+import { RootUI } from "./components/RootUI.tsx";
+import { MainPage } from "./pages/MainPage.tsx";
+import { MapPage } from "./pages/MapPage.tsx";
 
 export function createManagerUI(ns, pid, onPageChange) {
 	const ids = {
