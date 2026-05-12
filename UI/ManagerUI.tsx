@@ -1,9 +1,12 @@
 import { RootUI } from "/UI/components/RootUI.tsx";
+import { MainPage } from "/UI/pages/MainPage.tsx";
+import { MapPage } from "/UI/pages/MapPage.tsx";
 
-export function createManagerUI(ns : NS, pid : number) {
+export function createManagerUI(ns, pid, onPageChange) {
 	const ids = {
 		root: `ui-root-${pid}`,
-		display: `ui-display-${pid}`,
+		pageContainer: `ui-page-${pid}`,
+		navbar: `ui-navbar-${pid}`,
 		btnMain: `ui-btn-main-${pid}`,
 		btnMap: `ui-btn-map-${pid}`,
 		btnUpdate: `ui-btn-update-${pid}`,
@@ -11,60 +14,60 @@ export function createManagerUI(ns : NS, pid : number) {
 	};
 
 	let doc = null;
-	let el = {};
-	
-	function check() {
-		ns.tprint("check");
-	}
+	let pageContainer = null;
 
-	function mount() {
+	const pages = {
+		MAIN: MainPage(),
+		MAP: MapPage(),
+	};
+
+	let currentPage = "MAIN";
+
+	async function mount() {
 		ns.ui.openTail();
 		ns.printRaw(<RootUI ids={ids} />);
+		await ns.sleep(0);
+		
+		doc = eval("document");
+		pageContainer = doc.getElementById(ids.pageContainer);
+
+		bindNavbar();
+		await renderPage(currentPage, {});
 	}
 
-	function bind() {
-		try { doc = eval("document"); } catch { return false; }
-
-		el.display = doc.getElementById(ids.display);
-		el.btnMain = doc.getElementById(ids.btnMain);
-		el.btnMap = doc.getElementById(ids.btnMap);
-		el.btnUpdate = doc.getElementById(ids.btnUpdate);
-		el.status = doc.getElementById(ids.status);
-
-		if (!el.display) return false;
-
-		return true;
+	function bindNavbar() {
+		doc.getElementById(ids.btnMain).onclick = () => onPageChange("MAIN");
+		doc.getElementById(ids.btnMap).onclick = () => onPageChange("MAP");
+		doc.getElementById(ids.btnUpdate).onclick = () => rebind();
 	}
 
-	function updateDisplay(text) {
-		if (el.display) el.display.textContent = text;
+	async function renderPage(name, data) {
+		currentPage = name;
+
+		const page = pages[name];
+
+		pageContainer.innerHTML = "";
+		pageContainer.appendChild(page.render());
+
+		await ns.sleep(0);
+		page.bind(doc);
+		page.update(data);
 	}
 
-	function setStatus(text) {
-		if (el.status) el.status.textContent = text;
+	function updatePage(data) {
+		pages[currentPage].update(data);
 	}
 
 	function rebind() {
-		bind();
-		setStatus("rebound");
-	}
-
-	function cleanup() {
-		try {
-			const d = eval("document");
-			const root = d.getElementById(ids.root);
-			if (root) root.remove();
-		} catch { }
+		doc = eval("document");
+		bindNavbar();
+		pages[currentPage].bind(doc);
 	}
 
 	return {
-		ids,
 		mount,
-		bind,
-		updateDisplay,
-		setStatus,
+		renderPage,
+		updatePage,
 		rebind,
-		cleanup,
-		elements: el,
 	};
 }

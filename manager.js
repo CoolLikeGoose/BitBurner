@@ -3,45 +3,51 @@ import { injectCSS } from "/UI/UIHelper.tsx";
 
 /** @param {NS} ns **/
 export async function main(ns) {
-	disableLogs();
-	injectCSS(ns, "/UI/styles/button.css.txt", "gbb-styles-custom", "001");
+    disableLogs();
+    injectCSS(ns, "/UI/styles/button.css.txt", "goose-bb-styles", "001");
 
-	const ui = createManagerUI(ns, ns.pid);
+    let page = "MAIN";
+    let updateUIflag = 0;
+    let lastData = {};
+		
+    const ui = createManagerUI(ns, ns.pid, (newPage) => {
+        page = newPage;
+        ui.renderPage(page, lastData);
+    });
 
-	ui.mount();
-	await ns.sleep(0);
-	ui.bind();
-	ui.setStatus("ready");
+    await ui.mount();
+    attachHUDButton();
 
-	ns.atExit(ui.cleanup);
+    while (true) {
+        const money = Math.floor(ns.getServerMoneyAvailable("home"));
+        const ram = ns.getServerMaxRam("home");
 
-	let page = "MAIN";
-	let prevMoney = -1;
+        lastData = { money, ram };
+        ui.updatePage(lastData);
 
-	while (true) {
-		const money = Math.floor(ns.getServerMoneyAvailable("home"));
+        if (updateUIflag) {
+            ns.ui.openTail();
+            ui.rebind();
+            updateUIflag = 0;
+        }
 
-		if (money !== prevMoney) {
-			if (page === "MAIN") {
-				ui.updateDisplay(`MAIN\nMoney: ${money}`);
-			} else if (page === "MAP") {
-				ui.updateDisplay("MAP\nTest1\nTest2\nTest3");
-			}
-			prevMoney = money;
-		}
+        await ns.sleep(500);
+    }
 
-		// кнопки
-		const el = ui.elements;
-		if (el.btnMain) el.btnMain.onclick = () => { page = "MAIN"; };
-		if (el.btnMap) el.btnMap.onclick = () => { page = "MAP"; };
-		if (el.btnUpdate) el.btnUpdate.onclick = () => ui.rebind();
+    function attachHUDButton() {
+        const doc = eval("document");
+        const hook = doc.getElementById("overview-extra-hook-0");
+        if (!hook) return;
 
-		await ns.sleep(500);
-	}
+        hook.innerHTML = `<span id="mgr-ui-btn" class="bb-button">Manager UI</span>`;
 
-	function disableLogs() {
-		ns.disableLog("disableLog");
-		ns.disableLog("sleep");
-		ns.disableLog("getServerMoneyAvailable");
-	}
+        const btn = doc.getElementById("mgr-ui-btn");
+        btn.onclick = () => updateUIflag = 1;
+    }
+
+    function disableLogs() {
+        ns.disableLog("disableLog");
+        ns.disableLog("sleep");
+        ns.disableLog("getServerMoneyAvailable");
+    }
 }
