@@ -1,31 +1,28 @@
 import { TextDisplay } from "../components/TextDisplay.tsx";
+import { BarDisplay } from "../components/BarDisplay.tsx";
 
 export function MainPage() {
-    const money = TextDisplay("money", "Money");
-    const ram = TextDisplay("ram", "RAM");
+	const money = TextDisplay("gs-money", "Money");
+	const ramBar = BarDisplay("gs-ramHome", "HOME RAM");
 
-    const components = { money, ram };
+	const components = { money, ramBar };
 
-    return {
-        components,
+	return {
+		components,
 
-        render() {
-            return (
-                <div>
-                    {money.render()}
-                    {ram.render()}
-                </div>
-            );
-        },
+		render() {
+			return `<div>${money.render()}${ramBar.render()}</div>`;
+		},
 
-        bind(root) {
-            money.bind(root);
-            ram.bind(root);
-        },
 
-        update(data) {
-            if (data.money !== undefined) money.update(data.money);
-            if (data.ram !== undefined) ram.update(data.ram);
-        }
-    };
+		bind(root: Document) {
+			money.bind(root);
+			ramBar.bind(root);
+		},
+
+		update(data: any) {
+			if (data.money !== undefined) money.update(data.money);
+			if (data.ramCurrent !== undefined) ramBar.update(data.ramCurrent, data.ramMax);
+		}
+	};
 }

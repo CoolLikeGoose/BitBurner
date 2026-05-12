@@ -1,23 +1,19 @@
 export function TextDisplay(id: string, label: string) {
-    let el: HTMLElement | null = null;
+	let el: HTMLElement | null = null;
 
-    return {
-        id,
+	return {
+		id,
 
-        render() {
-            return (
-                <div id={id}>
-                    {label}: ...
-                </div>
-            );
-        },
+		render() {
+			return `<div id="${id}">${label}: ...</div>`;
+		},
 
-        bind(root: Document) {
-            el = root.getElementById(id);
-        },
+		bind(root: Document) {
+			el = root.getElementById(id);
+		},
 
-        update(value: any) {
-            if (el) el.innerText = `${label}: ${value}`;
-        }
-    };
+		update(value: any) {
+			if (el) el.innerText = `${label}: ${value}`;
+		}
+	};
 }

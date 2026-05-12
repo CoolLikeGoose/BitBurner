@@ -1,6 +1,9 @@
 .PHONY: clean-all clean-common clean-shared clean-tool clean-ui clean-manager
 
-clean-all: clean-common clean-shared clean-tool clean-ui clean-manager
+all: clean-all
+	@echo Code wiped
+
+clean-all: clean-common clean-shared clean-tool clean-ui clean-manager clean-hacknet clean-test
 	@echo All cleaned
 
 clean-common:
@@ -17,3 +20,9 @@ clean-ui:
 
 clean-manager:
 	@powershell -Command "if (Test-Path manager.js) { Remove-Item -Force manager.js; Write-Output 'Removed manager.js' }"
+
+clean-hacknet:
+	@powershell -Command "if (Test-Path hack-net-auto.js) { Remove-Item -Force manager.js; Write-Output 'Removed hack-net-auto.js' }"
+
+clean-test:
+	@powershell -Command "if (Test-Path test.tsx) { Remove-Item -Force manager.js; Write-Output 'Removed test.tsx' }"

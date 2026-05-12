@@ -20,9 +20,10 @@ export async function main(ns) {
 
     while (true) {
         const money = Math.floor(ns.getServerMoneyAvailable("home"));
-        const ram = ns.getServerMaxRam("home");
+        const ramMax = ns.getServerMaxRam("home");
+				const ramCurrent = ns.getServerUsedRam("home");
 
-        lastData = { money, ram };
+        lastData = { money, ramCurrent, ramMax };
         ui.updatePage(lastData);
 
         if (updateUIflag) {
@@ -49,5 +50,7 @@ export async function main(ns) {
         ns.disableLog("disableLog");
         ns.disableLog("sleep");
         ns.disableLog("getServerMoneyAvailable");
+        ns.disableLog("getServerMaxRam");
+        ns.disableLog("getServerUsedRam");
     }
 }
