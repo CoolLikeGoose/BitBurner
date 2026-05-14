@@ -2,7 +2,11 @@ import { RootUI } from "./components/RootUI.tsx";
 import { MainPage } from "./pages/MainPage.tsx";
 import { MapPage } from "./pages/MapPage.tsx";
 
-export function createManagerUI(ns: NS, pid: number, onPageChange: Function) {
+export function createManagerUI(ns: NS, pid: number,
+	serverManager: Function,
+	onPageChange: Function,
+	onUIEvent: Function) 
+{
 	const ids = {
 		pageContainer: `goose-ui-page-${pid}`,
 		btnMain: `goose-ui-btn-main-${pid}`,
@@ -14,7 +18,7 @@ export function createManagerUI(ns: NS, pid: number, onPageChange: Function) {
 
 	const pages = {
 		MAIN: MainPage(),
-		MAP: MapPage(),
+		MAP: MapPage(serverManager, onUIEvent),
 	};
 
 	let currentPage = "MAIN";
@@ -49,7 +53,7 @@ export function createManagerUI(ns: NS, pid: number, onPageChange: Function) {
 	function rebind() {
 		doc = eval("document");
 		pageContainer = doc.getElementById(ids.pageContainer);
-		
+
 		bindNavbar();
 
 		renderCurrentPage();

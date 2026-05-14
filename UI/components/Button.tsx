@@ -5,11 +5,7 @@ export function Button(id: string, label: string, onClick: () => void) {
         id,
 
         render() {
-            return (
-                <button id={id} className="bb-button">
-                    {label}
-                </button>
-            );
+            return `<button id=${id} className="bb-button">${label}</button>`;
         },
 
         bind(root: Document) {

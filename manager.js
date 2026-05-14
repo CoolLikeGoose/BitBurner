@@ -1,56 +1,84 @@
 import { createManagerUI } from "/UI/ManagerUI.tsx";
+import { createServerManager } from "/managers/ServerManager.js";
 import { injectCSS } from "/UI/UIHelper.tsx";
 
 /** @param {NS} ns **/
 export async function main(ns) {
-    disableLogs();
-    injectCSS(ns, "/UI/styles/button.css.txt", "goose-bb-styles", "001");
+	disableLogs();
+	injectCSS(ns, "/UI/styles/button.css.txt", "goose-bb-styles", "001");
 
-    let page = "MAIN";
-    let updateUIflag = 0;
-    let lastData = {};
-		
-    const ui = createManagerUI(ns, ns.pid, (newPage) => {
-        page = newPage;
-        ui.renderPage(page, lastData);
-    });
+	let page = "MAIN";
+	let rebindUIflag = 0;
+	let uiEvent = null;
+	let lastData = {};
 
-    await ui.mount();
-    attachHUDButton();
+	const serverManager = createServerManager(ns);
+	serverManager.scanNetwork();
 
-    while (true) {
-        const money = Math.floor(ns.getServerMoneyAvailable("home"));
-        const ramMax = ns.getServerMaxRam("home");
-				const ramCurrent = ns.getServerUsedRam("home");
+	const ui = createManagerUI(ns, ns.pid, serverManager,
+		(newPage) => {
+			page = newPage;
+			ui.renderPage(page, lastData);
+		},
+		(event) => {
+			uiEvent = event;
+		});
 
-        lastData = { money, ramCurrent, ramMax };
-        ui.updatePage(lastData);
+	await ui.mount();
+	attachHUDButton();
 
-        if (updateUIflag) {
-            ns.ui.openTail();
-            ui.rebind();
-            updateUIflag = 0;
-        }
+	while (true) {
+		const money = Math.floor(ns.getServerMoneyAvailable("home"));
+		const ramMax = ns.getServerMaxRam("home");
+		const ramCurrent = ns.getServerUsedRam("home");
 
-        await ns.sleep(500);
-    }
+		lastData = { money, ramCurrent, ramMax };
+		ui.updatePage(lastData);
 
-    function attachHUDButton() {
-        const doc = eval("document");
-        const hook = doc.getElementById("overview-extra-hook-0");
-        if (!hook) return;
+		checkUiEvent();
+		checkRebindUi();
 
-        hook.innerHTML = `<span id="mgr-ui-btn" class="bb-button">Manager UI</span>`;
+		await ns.sleep(500);
+	}
 
-        const btn = doc.getElementById("mgr-ui-btn");
-        btn.onclick = () => updateUIflag = 1;
-    }
+	// ============================= UI =============================
+	function checkUiEvent() {
+		if (uiEvent) {
+			ns.toast(uiEvent.text);
+			uiEvent = null;
+		}
+	}
 
-    function disableLogs() {
-        ns.disableLog("disableLog");
-        ns.disableLog("sleep");
-        ns.disableLog("getServerMoneyAvailable");
-        ns.disableLog("getServerMaxRam");
-        ns.disableLog("getServerUsedRam");
-    }
+	function checkRebindUi() {
+		if (rebindUIflag) {
+			ns.ui.openTail();
+			ui.rebind();
+			rebindUIflag = 0;
+		}
+	}
+
+	function attachHUDButton() {
+		const doc = eval("document");
+		const hook = doc.getElementById("overview-extra-hook-0");
+		if (!hook) return;
+
+		hook.innerHTML = `<span id="mgr-ui-btn" class="bb-button">Manager</span>`;
+
+		const btn = doc.getElementById("mgr-ui-btn");
+		btn.onclick = () => rebindUIflag = 1;
+	}
+
+	function disableLogs() {
+		const all = true;
+
+		if (all) {
+			ns.disableLog("ALL");
+		} else {
+			ns.disableLog("disableLog");
+			ns.disableLog("sleep");
+			ns.disableLog("getServerMoneyAvailable");
+			ns.disableLog("getServerMaxRam");
+			ns.disableLog("getServerUsedRam");
+		}
+	}
 }
