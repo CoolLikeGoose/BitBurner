@@ -1,5 +1,7 @@
-export function createServerManager(ns) {
+export function createServerManager(ns, data) {
 	const servers = {}; // hostname -> serverInfo
+
+	let currentHackLvl = data.currentHackLvl;
 
 	function scanNetwork() {
 		servers["home"] = makeServerInfo("home", null);
@@ -9,12 +11,14 @@ export function createServerManager(ns) {
 
 	function makeServerInfo(host, parent) {
 		const s = ns.getServer(host);
+		const isHackable = !(s.requiredHackingSkill > currentHackLvl); 
 
 		return {
 			host,
 			parent,
 			children: [],
 			hasRoot: s.hasAdminRights,
+			isHackable,
 			connectChain: [],
 			attractiveness: 0,
 		};

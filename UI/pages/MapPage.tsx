@@ -4,7 +4,7 @@ export function MapPage(serverManager, onServerClick) {
 	return {
 		render() {
 			const tree = serverManager.getTree();
-			return `<div>${renderNode("home", tree, 0)}</div>`;
+			return `<div>${renderNode("home", tree, 0, [])}</div>`;
 		},
 
 		bind(root: Document) {
@@ -17,10 +17,23 @@ export function MapPage(serverManager, onServerClick) {
 		update(value: any) { }
 	};
 
-	function renderNode(host, tree, level) {
+	function renderNode(host, tree, level, isLastArr) {
 		const server = tree[host];
-		const color = server.hasRoot ? "#4CAF50" : "#F44336";
-		const prefix = level === 0 ? "" : "│ ".repeat(level - 1) + "├─ ";
+		let color = "#F44336";
+		if (server.isHackable) {
+			color = "#4CAF50";
+		} else if (server.hasRoot) {
+			color = "#f4be36ff";
+		}
+
+		let prefix = "";
+		for (let i = 0; i < level - 1; i++) {
+			prefix += isLastArr[i] ? "  " : "│ ";
+		}
+
+		if (level > 0) {
+			prefix += isLastArr[level - 1] ? "└─ " : "├─ ";
+		}
 
 		const cmd = server.connectChain
 			.map(h => (h === "home" ? "home" : `connect ${h}`))
@@ -31,8 +44,12 @@ export function MapPage(serverManager, onServerClick) {
 		html += `${prefix}<a style="color:${color}; cursor:pointer; text-decoration:none" href="javascript:navigator.clipboard.writeText('${cmd}')">${host}</a>`;
 		html += `</div>`;
 
-		for (const child of server.children) {
-			html += renderNode(child, tree, level + 1);
+		const children = server.children;
+		const lastIndex = children.length - 1;
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			const isLast = i === lastIndex;
+			html += renderNode(child, tree, level + 1, [...isLastArr, isLast]);
 		}
 
 		return html;

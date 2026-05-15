@@ -12,7 +12,9 @@ export async function main(ns) {
 	let uiEvent = null;
 	let lastData = {};
 
-	const serverManager = createServerManager(ns);
+	let currentHackLvl = ns.getHackingLevel();
+
+	const serverManager = createServerManager(ns, {currentHackLvl});
 	serverManager.scanNetwork();
 
 	const ui = createManagerUI(ns, ns.pid, serverManager,

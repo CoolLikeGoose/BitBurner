@@ -3,7 +3,7 @@
 all: clean-all
 	@echo Code wiped
 
-clean-all: clean-common clean-shared clean-tool clean-ui clean-manager clean-hacknet clean-test clean-txt clean-data
+clean-all: clean-common clean-shared clean-tool clean-ui clean-manager clean-hacknet clean-test clean-txt clean-data clean-managers
 	@echo All cleaned
 
 clean-common:
@@ -20,6 +20,9 @@ clean-ui:
 
 clean-data:
 	@powershell -Command "if (Test-Path data) { Remove-Item -Recurse -Force data; Write-Output 'Removed data' }"
+
+clean-managers:
+	@powershell -Command "if (Test-Path managers) { Remove-Item -Recurse -Force managers; Write-Output 'Removed managers' }"
 
 # files
 clean-manager:
