@@ -13,6 +13,7 @@ export function RootUI({ids}) {
 			<div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
 				<button id={ids.btnMain} className="bb-button">MAIN</button>
 				<button id={ids.btnMap} className="bb-button">MAP</button>
+				<button id={ids.btnSct} className="bb-button">SCRIPTS</button>
 			</div>
 		</div>
 	);

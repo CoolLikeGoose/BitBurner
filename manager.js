@@ -1,20 +1,20 @@
 import { createManagerUI } from "/UI/ManagerUI.tsx";
 import { createServerManager } from "/managers/ServerManager.js";
-import { injectCSS } from "/UI/UIHelper.tsx";
+
+import { scriptsData } from "/common/scripts_data.js";
 
 /** @param {NS} ns **/
 export async function main(ns) {
 	disableLogs();
-	injectCSS(ns, "/UI/styles/button.css.txt", "goose-bb-styles", "001");
 
+	// UI vars
 	let page = "MAIN";
-	let rebindUIflag = 0;
 	let uiEvent = null;
 	let lastData = {};
 
 	let currentHackLvl = ns.getHackingLevel();
 
-	const serverManager = createServerManager(ns, {currentHackLvl});
+	const serverManager = createServerManager(ns, { currentHackLvl });
 	serverManager.scanNetwork();
 
 	const ui = createManagerUI(ns, ns.pid, serverManager,
@@ -38,25 +38,24 @@ export async function main(ns) {
 		ui.updatePage(lastData);
 
 		checkUiEvent();
-		checkRebindUi();
 
-		await ns.sleep(500);
+		await ns.asleep(500);
 	}
 
 	// ============================= UI =============================
 	function checkUiEvent() {
-		if (uiEvent) {
-			ns.toast(uiEvent.text);
-			uiEvent = null;
-		}
+		if (!uiEvent) return;
+
+		if (uiEvent.head == "RUN") {
+			runScript(uiEvent.data);
+		} 
+		
+		uiEvent = null;
 	}
 
-	function checkRebindUi() {
-		if (rebindUIflag) {
-			ns.ui.openTail();
-			ui.rebind();
-			rebindUIflag = 0;
-		}
+	function runScript(name) {
+		const file = scriptsData[name].file;
+		ns.run(file);
 	}
 
 	function attachHUDButton() {
@@ -67,7 +66,10 @@ export async function main(ns) {
 		hook.innerHTML = `<span id="mgr-ui-btn" class="bb-button">Manager</span>`;
 
 		const btn = doc.getElementById("mgr-ui-btn");
-		btn.onclick = () => rebindUIflag = 1;
+		btn.onclick = () => {
+			ns.ui.openTail();
+			ui.rebind();
+		};
 	}
 
 	function disableLogs() {

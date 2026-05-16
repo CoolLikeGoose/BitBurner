@@ -1,4 +1,4 @@
-export function MapPage(serverManager, onServerClick) {
+export function MapPage(serverManager, onToastMsg) {
 	let doc: Document | null = null;
 
 	return {
@@ -26,6 +26,7 @@ export function MapPage(serverManager, onServerClick) {
 			color = "#f4be36ff";
 		}
 
+		// Build prefix for prettier display in map page
 		let prefix = "";
 		for (let i = 0; i < level - 1; i++) {
 			prefix += isLastArr[i] ? "  " : "│ ";
@@ -35,6 +36,7 @@ export function MapPage(serverManager, onServerClick) {
 			prefix += isLastArr[level - 1] ? "└─ " : "├─ ";
 		}
 
+		// Build connection string
 		const cmd = server.connectChain
 			.map(h => (h === "home" ? "home" : `connect ${h}`))
 			.join("; ");
@@ -60,9 +62,7 @@ export function MapPage(serverManager, onServerClick) {
 		if (!el) return;
 
 		el.onclick = () => {
-			onServerClick({
-				text: `Copied: ${host}`,
-			});
+			onToastMsg(`Copied: ${host}`);
 		};
 
 		for (const child of tree[host].children) {

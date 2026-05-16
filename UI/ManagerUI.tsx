@@ -1,16 +1,21 @@
+import { injectCSS } from "./UIHelper.tsx";
 import { RootUI } from "./components/RootUI.tsx";
 import { MainPage } from "./pages/MainPage.tsx";
 import { MapPage } from "./pages/MapPage.tsx";
+import { ScriptsPage } from "./pages/ScriptsPage.tsx";
 
 export function createManagerUI(ns: NS, pid: number,
 	serverManager: Function,
 	onPageChange: Function,
 	onUIEvent: Function) 
 {
+	injectCSS(ns, "/UI/styles/button.css.txt", "goose-bb-styles", "001");
+
 	const ids = {
 		pageContainer: `goose-ui-page-${pid}`,
 		btnMain: `goose-ui-btn-main-${pid}`,
 		btnMap: `goose-ui-btn-map-${pid}`,
+		btnSct: `goose-ui-btn-script-${pid}`,
 	};
 
 	let doc: Document | null = null;
@@ -18,10 +23,15 @@ export function createManagerUI(ns: NS, pid: number,
 
 	const pages = {
 		MAIN: MainPage(),
-		MAP: MapPage(serverManager, onUIEvent),
+		MAP: MapPage(serverManager, onToastMsg),
+		SCRIPTS: ScriptsPage(onUIEvent),
 	};
 
 	let currentPage = "MAIN";
+
+	function onToastMsg(msg: string) {
+		ns.toast(msg);
+	}
 
 	async function mount() {
 		ns.ui.openTail();
@@ -38,6 +48,7 @@ export function createManagerUI(ns: NS, pid: number,
 	function bindNavbar() {
 		doc.getElementById(ids.btnMain).onclick = () => onPageChange("MAIN");
 		doc.getElementById(ids.btnMap).onclick = () => onPageChange("MAP");
+		doc.getElementById(ids.btnSct).onclick = () => onPageChange("SCRIPTS");
 	}
 
 	async function renderPage(name, data) {
