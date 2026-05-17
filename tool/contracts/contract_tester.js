@@ -5,9 +5,10 @@ export async function main(ns) {
 	ns.disableLog("ALL");
 	ns.ui.openTail();
 
-	const type = "Minimum Path Sum in a Triangle";
+	const type = "Sanitize Parentheses in Expression";
 	const server = "n00dles";
-	const repeat = 100;
+	const repeat = 115;
+	const printDetailed = false;
 	const testCase = null;
 
 	if (testCase) {
@@ -36,9 +37,18 @@ export async function main(ns) {
 		const result = ns.codingcontract.attempt(answer, cName, server);
 
 		if (result) {
+			if (printDetailed) {
+				ns.print(`SUCCESS Solved`);
+				ns.print(`\tInput was: ${data}`)
+				ns.print(`\tAnswer was: ${answer}`)
+			}
 			solvedCount++;
 		} else {
-			ns.print(`ERROR Failed`);
+			if (printDetailed) {
+				ns.print(`ERROR Failed`);
+				ns.print(`\tInput was: ${data}`)
+				ns.print(`\tAnswer was: ${answer}`)
+			}
 		}
 
 		await ns.sleep(5);
